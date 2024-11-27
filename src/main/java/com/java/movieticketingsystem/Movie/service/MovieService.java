@@ -40,8 +40,9 @@ public class MovieService implements IMovieService{
     }
 
     @Override
-    public String deleteById(long id) {
-        return "";
+    public void deleteById(long id) {
+        Movie movie = findById(id);
+        movieRepository.delete(movie);
     }
 
 }

@@ -5,6 +5,7 @@ import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.utils.IGenericCrudService;
 
 public interface IMovieService extends IGenericCrudService<Movie> {
+    Movie updateMovie(Long id, Movie movieDetails);
 
     /*
 The IMovieService interface extends IGenericCrudService<Movie>, which means it inherits all the common

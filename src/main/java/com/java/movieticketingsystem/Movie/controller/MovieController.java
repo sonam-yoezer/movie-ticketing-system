@@ -52,6 +52,12 @@ public class MovieController {
             return ResponseEntity.status(404).body(MovieConstants.NOT_FOUND); // Return 404 if the movie is not found
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @Validated @RequestBody Movie movieDetails) {
+        Movie updatedMovie = movieService.updateMovie(id, movieDetails);
+        return ResponseEntity.ok(updatedMovie);
+    }
 }
 
 

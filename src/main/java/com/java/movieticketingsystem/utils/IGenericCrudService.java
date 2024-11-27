@@ -40,7 +40,6 @@ public interface IGenericCrudService<T> {
      * Delete the entity by id.
      *
      * @param id Identifier for entity.
-     * @return String as message.
      */
-    String deleteById(long id);
+    void deleteById(long id);
 }

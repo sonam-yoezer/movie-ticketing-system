@@ -4,6 +4,7 @@ import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.Movie.service.MovieService;
 import com.java.movieticketingsystem.constants.MovieConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,16 @@ public class MovieController {
             return ResponseEntity.ok(movie.toString()); // Return 200 OK with the movie
         } catch (Exception e) {
             return ResponseEntity.status(404).body(MovieConstants.NOT_FOUND); // Return 404 with the constant message
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteMovieById(@PathVariable long id) {
+        try {
+            movieService.deleteById(id);
+            return ResponseEntity.ok("Movie deleted successfully."); // Return 200 OK with success message
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(MovieConstants.NOT_FOUND); // Return 404 if the movie is not found
         }
     }
 }

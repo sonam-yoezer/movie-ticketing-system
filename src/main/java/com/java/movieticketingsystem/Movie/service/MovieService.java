@@ -14,10 +14,6 @@ public class MovieService implements IMovieService{
     @Autowired
     private MovieRepository movieRepository;
 
-    @Override
-    public List<Movie> findAll() {
-        return List.of();
-    }
 
     @Override
     public Movie save(@NonNull Movie movie) {
@@ -26,8 +22,16 @@ public class MovieService implements IMovieService{
     }
 
     @Override
-    public Movie findById(long id) throws Exception {
-        return null;
+    public List<Movie> findAll() {
+        // Fetch all movies from the database
+        return movieRepository.findAll();
+    }
+
+    @Override
+    public Movie findById(long id) {
+        // Fetch movie by ID or throw IllegalArgumentException with a constant message
+        return movieRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(MovieConstants.NOT_FOUND));
     }
 
     @Override

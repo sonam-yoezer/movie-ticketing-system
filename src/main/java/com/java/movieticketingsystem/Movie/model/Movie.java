@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 
 @Entity
@@ -29,9 +28,43 @@ public class Movie {
     private LocalDateTime releaseDate;
 
     @Column(nullable = false)
-    private LocalTime duration;
+    private String duration;
 
     private String description;
+
+    //getter and setter method for update
+    public String getMovieName() {
+        return movieName;
+    }
+
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre){
+        this.genre = genre;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+
+    public String getDescription(){
+        return description;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
 }
 
 

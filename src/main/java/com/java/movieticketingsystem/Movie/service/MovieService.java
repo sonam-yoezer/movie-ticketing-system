@@ -1,5 +1,6 @@
 package com.java.movieticketingsystem.Movie.service;
 
+import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
 import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.Movie.repository.MovieRepository;
 import com.java.movieticketingsystem.constants.MovieConstants;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class MovieService implements IMovieService{
+public class MovieService implements IMovieService {
     @Autowired
     private MovieRepository movieRepository;
 
@@ -43,6 +44,20 @@ public class MovieService implements IMovieService{
     public void deleteById(long id) {
         Movie movie = findById(id);
         movieRepository.delete(movie);
+    }
+
+    @Override
+    public Movie updateMovie(Long id, Movie movieDetails) {
+        Movie existingMovie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie not found with id: " + id));
+
+        // Update the fields as needed
+        existingMovie.setMovieName(movieDetails.getMovieName());
+        existingMovie.setGenre(movieDetails.getGenre());
+        existingMovie.setDuration(String.valueOf(movieDetails.getDuration()));
+        existingMovie.setDescription(movieDetails.getDescription());
+        // Save the updated movie back to the database
+        return movieRepository.save(existingMovie);
     }
 
 }

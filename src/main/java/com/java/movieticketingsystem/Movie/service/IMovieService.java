@@ -1,12 +1,16 @@
-package com.java.movieticketingsystem.Movie.service;
+package com.java.movieticketingsystem.movie.service;
 
 
-import com.java.movieticketingsystem.Movie.model.Movie;
+import com.java.movieticketingsystem.movie.model.Movie;
 import com.java.movieticketingsystem.utils.IGenericCrudService;
+import io.micrometer.common.lang.NonNull;
 
-public interface IMovieService extends IGenericCrudService<Movie> {
+public interface IMovieService extends IGenericCrudService<Long, Movie> {
+    Movie save(@NonNull Movie movie);
+
+    String update(Movie entity);
+
     Movie updateMovie(Long id, Movie movieDetails);
-
     /*
 The IMovieService interface extends IGenericCrudService<Movie>, which means it inherits all the common
 CRUD operations for the Movie entity, such as save(), findById(), findAll(), update(), and delete().

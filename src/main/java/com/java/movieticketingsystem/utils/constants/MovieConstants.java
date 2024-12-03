@@ -1,4 +1,4 @@
-package com.java.movieticketingsystem.constants;
+package com.java.movieticketingsystem.utils.constants;
 
 public class MovieConstants {
     public static final String UPDATE_SUCCESSFULL = "Movie updated successfully";

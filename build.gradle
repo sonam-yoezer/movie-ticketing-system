@@ -28,6 +28,15 @@ dependencies {
 	// Hibernate Validator for validation annotations
 	implementation 'org.hibernate.validator:hibernate-validator'
 
+	implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
+
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
 }
 
 tasks.named('test') {

@@ -1,9 +1,9 @@
-package com.java.movieticketingsystem.Movie.service;
+package com.java.movieticketingsystem.movie.service;
 
 import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
-import com.java.movieticketingsystem.Movie.model.Movie;
-import com.java.movieticketingsystem.Movie.repository.MovieRepository;
-import com.java.movieticketingsystem.constants.MovieConstants;
+import com.java.movieticketingsystem.movie.model.Movie;
+import com.java.movieticketingsystem.movie.repository.MovieRepository;
+import com.java.movieticketingsystem.utils.constants.MovieConstants;
 import io.micrometer.common.lang.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,19 @@ public class MovieService implements IMovieService {
 
     @Override
     public Movie save(@NonNull Movie movie) {
-        //TODO: Validate for save
         return movieRepository.save(movie);
     }
+
 
     @Override
     public List<Movie> findAll() {
         // Fetch all movies from the database
         return movieRepository.findAll();
+    }
+
+    @Override
+    public Movie save(Long entity) {
+        return null;
     }
 
     @Override
@@ -36,14 +41,20 @@ public class MovieService implements IMovieService {
     }
 
     @Override
+    public String update(long id, Long entity) {
+        return "";
+    }
+
+    @Override
     public String update(Movie entity) {
         return "";
     }
 
     @Override
-    public void deleteById(long id) {
+    public String deleteById(long id) {
         Movie movie = findById(id);
         movieRepository.delete(movie);
+        return null;
     }
 
     @Override

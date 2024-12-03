@@ -1,5 +1,5 @@
-package com.java.movieticketingsystem.Movie.repository;
-import com.java.movieticketingsystem.Movie.model.Movie;
+package com.java.movieticketingsystem.movie.repository;
+import com.java.movieticketingsystem.movie.model.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

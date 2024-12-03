@@ -1,4 +1,4 @@
-package com.java.movieticketingsystem.Movie.model;
+package com.java.movieticketingsystem.movie.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

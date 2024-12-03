@@ -1,10 +1,9 @@
-package com.java.movieticketingsystem.Movie.controller;
+package com.java.movieticketingsystem.movie.controller;
 
-import com.java.movieticketingsystem.Movie.model.Movie;
-import com.java.movieticketingsystem.Movie.service.MovieService;
-import com.java.movieticketingsystem.constants.MovieConstants;
+import com.java.movieticketingsystem.movie.model.Movie;
+import com.java.movieticketingsystem.movie.service.MovieService;
+import com.java.movieticketingsystem.utils.constants.MovieConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

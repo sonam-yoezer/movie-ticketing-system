@@ -14,6 +14,6 @@ MySQL DBMS
 
 # Installation Guidelines
 ```bash
-git clone git@github.com:impradp/CourseManager.git
+git clone git@github.com:sonam-yoezer/movie-ticketing-system.git
 cd coursemanager
 ./gradlew clean build

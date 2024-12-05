@@ -61,6 +61,10 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    private String getSecret() {
+        return secret;
+    }
+
     /**
      * Extract the username from the token
      *
@@ -127,11 +131,6 @@ public class JwtService {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
-
-    private String getSecret() {
-        // Replace this with your actual secret retrieval logic
-        return "aGVsbG9pYW1zb25hbTIwMDQ=";
     }
 
 }

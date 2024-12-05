@@ -25,7 +25,7 @@ public class UserController {
      * @return The details of the authenticated user.
      */
     @GetMapping("/self")
-    @PreAuthorize("hasAuthority('INSTRUCTOR')")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<RestResponse> fetchSelfInfo() {
         HashMap<String, Object> listHashMap = new HashMap<>();
         listHashMap.put("user", userService.fetchSelfInfo());

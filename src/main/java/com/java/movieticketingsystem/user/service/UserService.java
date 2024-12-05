@@ -33,10 +33,10 @@ public class UserService implements IUserService{
     @Autowired
     private UserRepository userRepository;
 
+
     @Override
     public List<UserDTO> findAll() {
-        List<User> user = this.userRepository.findAll();
-        return UserMapper.toDTO(user);
+        return List.of();
     }
 
     @Override
@@ -55,56 +55,22 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public UserDTO findById(long id) {
-        User user = this.userRepository.findById(id).orElseThrow(
-                () -> new GlobalExceptionWrapper.NotFoundException(String.format(NOT_FOUND_MESSAGE, USER.toLowerCase())));
-        return UserMapper.toDTO(user);
-    }
-
-    public UserDTO fetchSelfInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = ((UserInfoDetails) authentication.getPrincipal()).getUsername();
-        return  findByEmail(email).orElseThrow(
-                () -> new GlobalExceptionWrapper.NotFoundException(String.format(NOT_FOUND_MESSAGE, USER.toLowerCase())));
-    }
-
-    public Optional<UserDTO> findByEmail(@NonNull String emailId) {
-        Optional<User> user = this.userRepository.findByEmail(emailId);
-        return UserMapper.toDTO(user);
+    public UserDTO findById(long id) throws Exception {
+        return null;
     }
 
     @Override
-    public String update(long id, @NonNull User entity) {
-        UserDTO authenticatedUser = fetchSelfInfo();
-        User userEntity = UserMapper.toEntity(authenticatedUser);
-
-        //Allow update by admin to the instructor info.
-        if(Arrays.stream(authenticatedUser.getRoles().split(",")).anyMatch(role -> role.trim().equalsIgnoreCase("ADMIN"))){
-            userEntity = UserMapper.toEntity(findById(id));
-        }
-
-        userEntity.setName(entity.getName());
-        userEntity.setPhoneNumber(entity.getPhoneNumber());
-
-
-
-        this.userRepository.save(userEntity);
-        return String.format(UPDATED_SUCCESSFULLY_MESSAGE, USER);
+    public String update(long id, User entity) {
+        return "";
     }
 
     @Override
-    @Transactional
     public String deleteById(long id) {
-        UserDTO authenticatedUser = fetchSelfInfo();
-        User userEntity = UserMapper.toEntity(authenticatedUser);
-
-        //Allow to delete by admin to the instructor info.
-        if(Arrays.stream(authenticatedUser.getRoles().split(",")).anyMatch(role -> role.trim().equalsIgnoreCase("ADMIN"))){
-            userEntity = UserMapper.toEntity(findById(id));
-        }
-
-        this.userRepository.deleteById(userEntity.getId());
-        return String.format(DELETED_SUCCESSFULLY_MESSAGE, USER);
+        return "";
     }
 
+    @Override
+    public UserDTO fetchSelfInfo() {
+        return null;
+    }
 }

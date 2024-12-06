@@ -1,4 +1,4 @@
-package com.java.movieticketingsystem.movie.controller;
+package com.java.movieticketingsystem.Movie.controller;
 
 import com.java.movieticketingsystem.movie.model.Movie;
 import com.java.movieticketingsystem.movie.service.MovieService;

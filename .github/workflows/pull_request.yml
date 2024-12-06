@@ -1,0 +1,124 @@
+name: Comprehensive PR Approval Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - dev
+      - qa
+      - uat
+
+# Global environment variables for configuration and logging
+env:
+  WORKFLOW_DEBUG: 'true'
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extensive Diagnostic Logging
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "=== GitHub Context Diagnostics ==="
+          echo "Repository: ${{ github.repository }}"
+          echo "Event Name: ${{ github.event_name }}"
+          echo "PR Head Repo: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "PR Base Repo: ${{ github.event.pull_request.base.repo.full_name }}"
+          echo "Workflow Trigger Branch: ${{ github.ref }}"
+          echo "PR Approval Enabled: ${{ vars.ENABLE_PR_APPROVALS }}"
+          echo "Workflow Debug Mode: ${{ env.WORKFLOW_DEBUG }}"
+
+  require-approvals:
+    needs: diagnostics
+    if: >
+      (github.event.pull_request.head.repo.full_name == github.repository) && 
+      (vars.ENABLE_PR_APPROVALS == 'true' || vars.ENABLE_PR_APPROVALS == true)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Workflow Initialization Log
+        run: |
+          echo "=== Workflow Initialization ==="
+          echo "Starting PR Approval Workflow"
+          echo "Current Branch: ${{ github.head_ref }}"
+          echo "Base Branch: ${{ github.base_ref }}"
+          echo "PR Approval Setting: ${{ vars.ENABLE_PR_APPROVALS }}"
+
+      - name: Advanced PR Reviews Check
+        uses: actions/github-script@v7
+        id: review-validation
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Logging utility
+            const logVerbose = (message) => {
+              console.log([VERBOSE] ${message});
+            };
+
+            // Fetch PR details
+            const prNumber = context.issue.number;
+            logVerbose(Checking PR #${prNumber});
+
+            // Fetch reviews
+            const reviewsResponse = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            // Analyze reviews
+            const approvals = reviewsResponse.data.filter(
+              review => review.state === 'APPROVED'
+            );
+
+            // Get unique approvers
+            const uniqueApprovers = new Set(
+              approvals.map(review => review.user.login)
+            );
+
+            // Detailed logging
+            logVerbose(Unique Approvers: ${Array.from(uniqueApprovers).join(', ')});
+            // Validation checks
+            const failureReasons = [];
+
+            // Check unique approvals
+            if (uniqueApprovers.size < 2) {
+              failureReasons.push(Insufficient unique approvals. Required: 2, Current: ${uniqueApprovers.size});
+            }
+
+            // Prevent PR author approval
+            const prAuthor = context.payload.pull_request.user.login;
+            const authorApprovals = approvals.filter(
+              review => review.user.login === prAuthor
+            );
+
+            if (authorApprovals.length > 0) {
+              failureReasons.push('PR author cannot approve their own PR');
+            }
+
+            // Final validation
+            if (failureReasons.length > 0) {
+              core.setFailed(failureReasons.join('. '));
+              return {
+                approved: false,
+                reasons: failureReasons
+              };
+            }
+
+            return {
+              approved: true,
+              approversCount: uniqueApprovers.size
+            };
+
+      - name: Workflow Completion Log
+        if: always()
+        run: |
+          echo "Workflow Status: ${{ job.status }}"

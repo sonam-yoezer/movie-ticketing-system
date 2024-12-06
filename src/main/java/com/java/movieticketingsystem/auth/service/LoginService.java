@@ -1,5 +1,6 @@
 package com.java.movieticketingsystem.auth.service;
 
+import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
 import com.java.movieticketingsystem.auth.helper.JwtService;
 import com.java.movieticketingsystem.auth.helper.UserInfoService;
 import com.java.movieticketingsystem.auth.model.AuthRequest;
@@ -28,7 +29,7 @@ public class LoginService {
      * @param authRequest The user provided credentials.
      * @return The token on validating the user.
      */
-    public String authenticate(@NonNull AuthRequest authRequest){
+    public String authenticate(@NonNull AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
         );
@@ -38,6 +39,4 @@ public class LoginService {
             throw new GlobalExceptionWrapper.BadRequestException("Invalid Credentials.");
         }
     }
-
-
 }

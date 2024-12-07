@@ -4,6 +4,7 @@ import com.java.movieticketingsystem.auth.helper.UserInfoDetails;
 import com.java.movieticketingsystem.user.mapper.UserMapper;
 import com.java.movieticketingsystem.user.model.User;
 import com.java.movieticketingsystem.user.model.UserDTO;
+import com.java.movieticketingsystem.user.model.UserUpdateDTO;
 import com.java.movieticketingsystem.user.repository.UserRepository;
 import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper;
 import jakarta.transaction.Transactional;
@@ -103,5 +104,51 @@ public class UserService implements IUserService{
 
         this.userRepository.deleteById(userEntity.getId());
         return String.format(DELETED_SUCCESSFULLY_MESSAGE, USER);
+    }
+
+
+    @Override
+    public String updatePartial(long id, UserUpdateDTO updateDTO) {
+        // Validate that at least one field is present
+        if (!updateDTO.hasAtLeastOneField()) {
+            throw new GlobalExceptionWrapper.BadRequestException("At least one field must be provided for update");
+        }
+
+        // Get authenticated user
+        UserDTO authenticatedUser = fetchSelfInfo();
+
+        // Check if user has permission to update (must be admin or self)
+        boolean isAdmin = Arrays.stream(authenticatedUser.getRoles().split(","))
+                .anyMatch(role -> role.trim().equalsIgnoreCase("ADMIN"));
+        boolean isSelf = authenticatedUser.getId() == id;
+
+        if (!isAdmin && !isSelf) {
+            throw new GlobalExceptionWrapper.UnauthorizedException("You don't have permission to update this user");
+        }
+
+        // Fetch user to update
+        User userToUpdate = userRepository.findById(id)
+                .orElseThrow(() -> new GlobalExceptionWrapper.NotFoundException(
+                        String.format(NOT_FOUND_MESSAGE, USER.toLowerCase())));
+
+        // Apply updates only for non-null fields
+        if (updateDTO.getName() != null) {
+            userToUpdate.setName(updateDTO.getName());
+        }
+        if (updateDTO.getPhoneNumber() != null) {
+            userToUpdate.setPhoneNumber(updateDTO.getPhoneNumber());
+        }
+        if (updateDTO.getEmail() != null) {
+            // Check if new email already exists (skip check if email unchanged)
+            if (!updateDTO.getEmail().equals(userToUpdate.getEmail()) &&
+                    userRepository.existsByEmail(updateDTO.getEmail())) {
+                throw new GlobalExceptionWrapper.BadRequestException(DUPLICATE_EMAIL_MESSAGE);
+            }
+            userToUpdate.setEmail(updateDTO.getEmail());
+        }
+
+        // Save updates
+        userRepository.save(userToUpdate);
+        return String.format(UPDATED_SUCCESSFULLY_MESSAGE, USER);
     }
 }

@@ -1,6 +1,7 @@
 package com.java.movieticketingsystem.user.controller;
 
 import com.java.movieticketingsystem.user.model.User;
+import com.java.movieticketingsystem.user.model.UserUpdateDTO;
 import com.java.movieticketingsystem.user.service.UserService;
 import com.java.movieticketingsystem.utils.RestHelper;
 import com.java.movieticketingsystem.utils.RestResponse;
@@ -88,6 +89,19 @@ public class UserController {
         return RestHelper.responseMessage(message);
     }
 
-
+    /**
+     * Updates partial information of the user.
+     * @param id The user id to update
+     * @param updateDTO The DTO containing fields to update
+     * @return Response containing update confirmation message
+     */
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<RestResponse> updatePartial(
+            @PathVariable long id,
+            @Validated @RequestBody UserUpdateDTO updateDTO) {
+        String message = userService.updatePartial(id, updateDTO);
+        return RestHelper.responseMessage(message);
+    }
 
 }

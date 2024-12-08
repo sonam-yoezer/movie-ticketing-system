@@ -20,7 +20,7 @@ public class RestHelper {
 
     public static ResponseEntity<RestResponse> responseError(String msg) {
         RestResponse restResponse = new RestResponse();
-        restResponse.setError(msg);
+        restResponse.setMessage(msg);
         restResponse.setStatus(false);
         return ResponseEntity.ok(restResponse);
     }

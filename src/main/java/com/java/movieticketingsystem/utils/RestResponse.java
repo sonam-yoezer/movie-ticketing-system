@@ -11,7 +11,6 @@ import java.util.Map;
 public class RestResponse {
 
     private Boolean status;
-    private String error;
     private String message;
     private String errorTrace;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)

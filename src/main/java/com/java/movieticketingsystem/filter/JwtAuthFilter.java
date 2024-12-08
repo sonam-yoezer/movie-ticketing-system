@@ -78,7 +78,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Create a RestResponse for expired token
             RestResponse restResponse = new RestResponse();
             restResponse.setStatus(false);
-            restResponse.setError(AUTH_TOKEN_EXPIRED);
+            restResponse.setMessage(AUTH_TOKEN_EXPIRED);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             response.getWriter().write(
@@ -91,7 +91,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Create a generic error response
             RestResponse restResponse = new RestResponse();
             restResponse.setStatus(false);
-            restResponse.setError(AUTH_FAILED);
+            restResponse.setMessage(AUTH_FAILED);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             response.getWriter().write(

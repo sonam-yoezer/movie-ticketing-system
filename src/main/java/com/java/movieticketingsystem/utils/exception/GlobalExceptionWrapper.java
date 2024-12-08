@@ -79,4 +79,16 @@ public class GlobalExceptionWrapper {
             this.exception = exception;
         }
     }
+
+    public static class UnauthorizedException extends RuntimeException implements IGlobalException {
+        public UnauthorizedException(String message) {
+            super(message);
+        }
+
+        @Override
+        public ResponseEntity<RestResponse> getResponse(Exception exception) {
+            RestResponse restResponse = setErrorResponse(exception);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(restResponse);
+        }
+    }
 }

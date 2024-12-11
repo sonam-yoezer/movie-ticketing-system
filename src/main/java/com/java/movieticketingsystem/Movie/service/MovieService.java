@@ -1,4 +1,4 @@
-package com.java.movieticketingsystem.movie.service;
+package com.java.movieticketingsystem.Movie.service;
 
 import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
 import com.java.movieticketingsystem.movie.model.Movie;
@@ -21,6 +21,11 @@ public class MovieService implements IMovieService {
         return movieRepository.save(movie);
     }
 
+    @Override
+    public String update(long id, Long entity) {
+        return "";
+    }
+
 
     @Override
     public List<Movie> findAll() {
@@ -34,15 +39,20 @@ public class MovieService implements IMovieService {
     }
 
     @Override
+    public Movie fetchById(long id) throws Exception {
+        return null;
+    }
+
+    @Override
+    public String update(long id, Movie entity) {
+        return "";
+    }
+
+    @Override
     public Movie findById(long id) {
         // Fetch movie by ID or throw IllegalArgumentException with a constant message
         return movieRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(MovieConstants.NOT_FOUND));
-    }
-
-    @Override
-    public String update(long id, Long entity) {
-        return "";
     }
 
     @Override

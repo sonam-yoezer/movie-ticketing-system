@@ -1,20 +1,24 @@
 package com.java.movieticketingsystem.user.service;
 
-
 import com.java.movieticketingsystem.user.model.User;
 import com.java.movieticketingsystem.user.model.UserDTO;
 import com.java.movieticketingsystem.user.model.UserUpdateDTO;
 import com.java.movieticketingsystem.utils.IGenericCrudService;
+import lombok.NonNull;
 
-public interface IUserService extends IGenericCrudService <User, UserDTO> {
+public interface IUserService extends IGenericCrudService<User, UserDTO> {
+    UserDTO fetchById(long id);
+
+    User findById(long id);
 
     /**
-     * Fetches the authenticated instructor info.
+     * Fetches the authenticated user info.
      *
-     * @return The instructor dto
+     * @return The user dto
      */
-    UserDTO fetchSelfInfo();
+    User fetchSelfInfo();
 
-    String updatePartial(long id, UserUpdateDTO updateDTO);
+    String update(long id, @NonNull UserDTO userDTO);
+
+    String update(long id, @NonNull UserUpdateDTO userUpdateDTO);
 }
-

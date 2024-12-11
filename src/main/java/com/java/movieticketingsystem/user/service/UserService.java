@@ -7,6 +7,7 @@ import com.java.movieticketingsystem.user.model.UserDTO;
 import com.java.movieticketingsystem.user.model.UserUpdateDTO;
 import com.java.movieticketingsystem.user.repository.UserRepository;
 import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,141 +15,120 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.java.movieticketingsystem.utils.constants.UserConstants.DELETED_SUCCESSFULLY_MESSAGE;
-import static com.java.movieticketingsystem.utils.constants.UserConstants.DUPLICATE_EMAIL_MESSAGE;
-import static com.java.movieticketingsystem.utils.constants.UserConstants.USER;
-import static com.java.movieticketingsystem.utils.constants.UserConstants.NOT_FOUND_MESSAGE;
-import static com.java.movieticketingsystem.utils.constants.UserConstants.UPDATED_SUCCESSFULLY_MESSAGE;
+import static com.java.movieticketingsystem.utils.constants.UserConstants.*;
 
 @Service
-public class UserService implements IUserService{
-
+public class UserService implements IUserService {
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    private PasswordEncoder encoder;
     @Autowired
     private UserRepository userRepository;
-
+    @Override
+    public List<UserDTO> findAll() {
+        List<User> user = this.userRepository.findAll();
+        return UserMapper.toDTO(user);
+    }
     @Override
     public UserDTO save(@NonNull User user) {
         //Check if same user already exists during signup
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new GlobalExceptionWrapper.BadRequestException(DUPLICATE_EMAIL_MESSAGE);
         }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(encoder.encode(user.getPassword()));
         user.setRoles("USER");
         User savedUser = this.userRepository.save(user);
-
         return UserMapper.toDTO(savedUser);
     }
-
     @Override
-    public List<UserDTO> findAll() {
-        List<User> user = this.userRepository.findAll();
+    public UserDTO fetchById(long id) {
+        User user = findById(id);
         return UserMapper.toDTO(user);
     }
+@Override
+public User findById(long id) {
+        return this.userRepository.findById(id).orElseThrow(
+                () -> new GlobalExceptionWrapper.NotFoundException(String.format(NOT_FOUND_MESSAGE,
+                        USER.toLowerCase())));
+    }
 
 
     @Override
-    public UserDTO findById(long id) {
-        User user = this.userRepository.findById(id).orElseThrow(
-                () -> new GlobalExceptionWrapper.NotFoundException(String.format(NOT_FOUND_MESSAGE, USER.toLowerCase())));
-        return UserMapper.toDTO(user);
+    public User fetchSelfInfo() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof UserInfoDetails) {
+                UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
+                String email = userDetails.getUsername();
+                return findByEmail(email).orElseThrow(
+                        () -> new GlobalExceptionWrapper.NotFoundException(String.format(NOT_FOUND_MESSAGE,
+                                USER.toLowerCase())));
+            }
+            throw new GlobalExceptionWrapper.UnauthorizedException("User not authenticated");
+        } catch (Exception e) {
+            throw new GlobalExceptionWrapper.UnauthorizedException("Error fetching user information: " + e.getMessage());
+        }
     }
-
-    public UserDTO fetchSelfInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = ((UserInfoDetails) authentication.getPrincipal()).getUsername();
-        return  findByEmail(email).orElseThrow(
-                () -> new GlobalExceptionWrapper.NotFoundException(String.format(NOT_FOUND_MESSAGE, USER.toLowerCase())));
+    public Optional<User> findByEmail(@NonNull String emailId) {
+        return this.userRepository.findByEmail(emailId);
     }
-
-    public Optional<UserDTO> findByEmail(@NonNull String emailId) {
-        Optional<User> user = this.userRepository.findByEmail(emailId);
-        return UserMapper.toDTO(user);
-    }
-
     @Override
-    public String update(long id, @NonNull User entity) {
-        UserDTO authenticatedUser = fetchSelfInfo();
-        User userEntity = UserMapper.toEntity(authenticatedUser);
+    public String update(long id, @NonNull UserDTO userDTO) {
+        // Get authenticated user
+        User authenticatedUser = fetchSelfInfo();
+        User userToUpdate;
 
-        //Allow update by admin to the instructor info.
-        if(Arrays.stream(authenticatedUser.getRoles().split(",")).anyMatch(role -> role.trim().equalsIgnoreCase("ADMIN"))){
-            userEntity = UserMapper.toEntity(findById(id));
+        // Check if user is admin or updating their own profile
+        if (Arrays.stream(authenticatedUser.getRoles().split(","))
+                .anyMatch(role -> role.trim().equalsIgnoreCase("ADMIN"))) {
+            userToUpdate = findById(id);
+        } else if (authenticatedUser.getId() != id) {
+            throw new GlobalExceptionWrapper.UnauthorizedException("You can only update your own profile");
+        } else {
+            userToUpdate = authenticatedUser;
         }
 
-        userEntity.setName(entity.getName());
-        userEntity.setPhoneNumber(entity.getPhoneNumber());
+        // Update fields if provided
+        if (userDTO.getName() != null && !userDTO.getName().trim().isEmpty()) {
+            userToUpdate.setName(userDTO.getName());
+        }
 
-        this.userRepository.save(userEntity);
+        if (userDTO.getPhoneNumber() != null && !userDTO.getPhoneNumber().trim().isEmpty()) {
+            userToUpdate.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+
+        if (userDTO.getEmail() != null && !userDTO.getEmail().trim().isEmpty()) {
+            // Check if new email already exists for another user
+            if (!userToUpdate.getEmail().equals(userDTO.getEmail()) &&
+                    userRepository.existsByEmail(userDTO.getEmail())) {
+                throw new GlobalExceptionWrapper.BadRequestException(DUPLICATE_EMAIL_MESSAGE);
+            }
+            userToUpdate.setEmail(userDTO.getEmail());
+        }
+
+        // Save the updated user
+        userRepository.save(userToUpdate);
         return String.format(UPDATED_SUCCESSFULLY_MESSAGE, USER);
+    }
+
+    @Override
+    public String update(long id, @NonNull UserUpdateDTO userUpdateDTO) {
+        return "";
     }
 
     @Override
     @Transactional
     public String deleteById(long id) {
-        UserDTO authenticatedUser = fetchSelfInfo();
-        User userEntity = UserMapper.toEntity(authenticatedUser);
-
-        //Allow to delete by admin to the instructor info.
-        if(Arrays.stream(authenticatedUser.getRoles().split(",")).anyMatch(role -> role.trim().equalsIgnoreCase("ADMIN"))){
-            userEntity = UserMapper.toEntity(findById(id));
+        User authenticatedUser = fetchSelfInfo();
+        //Allow to delete by admin to the user info.
+        if (Arrays.stream(authenticatedUser.getRoles().split(",")).anyMatch(role -> role.trim().equalsIgnoreCase(
+                "ADMIN"))) {
+            authenticatedUser = findById(id);
         }
-
-        this.userRepository.deleteById(userEntity.getId());
+        this.userRepository.deleteById(authenticatedUser.getId());
         return String.format(DELETED_SUCCESSFULLY_MESSAGE, USER);
-    }
-
-
-    @Override
-    public String updatePartial(long id, UserUpdateDTO updateDTO) {
-        // Validate that at least one field is present
-        if (!updateDTO.hasAtLeastOneField()) {
-            throw new GlobalExceptionWrapper.BadRequestException("At least one field must be provided for update");
-        }
-
-        // Get authenticated user
-        UserDTO authenticatedUser = fetchSelfInfo();
-
-        // Check if user has permission to update (must be admin or self)
-        boolean isAdmin = Arrays.stream(authenticatedUser.getRoles().split(","))
-                .anyMatch(role -> role.trim().equalsIgnoreCase("ADMIN"));
-        boolean isSelf = authenticatedUser.getId() == id;
-
-        if (!isAdmin && !isSelf) {
-            throw new GlobalExceptionWrapper.UnauthorizedException("You don't have permission to update this user");
-        }
-
-        // Fetch user to update
-        User userToUpdate = userRepository.findById(id)
-                .orElseThrow(() -> new GlobalExceptionWrapper.NotFoundException(
-                        String.format(NOT_FOUND_MESSAGE, USER.toLowerCase())));
-
-        // Apply updates only for non-null fields
-        if (updateDTO.getName() != null) {
-            userToUpdate.setName(updateDTO.getName());
-        }
-        if (updateDTO.getPhoneNumber() != null) {
-            userToUpdate.setPhoneNumber(updateDTO.getPhoneNumber());
-        }
-        if (updateDTO.getEmail() != null) {
-            // Check if new email already exists (skip check if email unchanged)
-            if (!updateDTO.getEmail().equals(userToUpdate.getEmail()) &&
-                    userRepository.existsByEmail(updateDTO.getEmail())) {
-                throw new GlobalExceptionWrapper.BadRequestException(DUPLICATE_EMAIL_MESSAGE);
-            }
-            userToUpdate.setEmail(updateDTO.getEmail());
-        }
-
-        // Save updates
-        userRepository.save(userToUpdate);
-        return String.format(UPDATED_SUCCESSFULLY_MESSAGE, USER);
     }
 }

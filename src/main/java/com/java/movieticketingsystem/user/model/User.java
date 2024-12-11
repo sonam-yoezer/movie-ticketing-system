@@ -84,6 +84,7 @@ public class User extends AuditEntity {
     }
 
     public String getRoles() {
+
         return roles;
     }
 

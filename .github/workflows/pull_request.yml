@@ -60,12 +60,12 @@ jobs:
           script: |
             // Logging utility
             const logVerbose = (message) => {
-              console.log([VERBOSE] ${message});
+              console.log(`[VERBOSE] ${message}`);
             };
 
             // Fetch PR details
             const prNumber = context.issue.number;
-            logVerbose(Checking PR #${prNumber});
+            logVerbose(`Checking PR #${prNumber}`);
 
             // Fetch reviews
             const reviewsResponse = await github.rest.pulls.listReviews({
@@ -85,13 +85,13 @@ jobs:
             );
 
             // Detailed logging
-            logVerbose(Unique Approvers: ${Array.from(uniqueApprovers).join(', ')});
+            logVerbose(`Unique Approvers: ${Array.from(uniqueApprovers).join(', ')}`);
             // Validation checks
             const failureReasons = [];
 
             // Check unique approvals
             if (uniqueApprovers.size < 2) {
-              failureReasons.push(Insufficient unique approvals. Required: 2, Current: ${uniqueApprovers.size});
+              failureReasons.push(`Insufficient unique approvals. Required: 2, Current: ${uniqueApprovers.size}`);
             }
 
             // Prevent PR author approval

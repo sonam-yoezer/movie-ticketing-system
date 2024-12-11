@@ -41,6 +41,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/login", "/api/v1/users").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/self").authenticated()
                         .anyRequest().authenticated() // Protect all other endpoints
                 )
                 .sessionManagement(sessionManager -> sessionManager
@@ -70,4 +73,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(); // Password encoding
     }
 }
-

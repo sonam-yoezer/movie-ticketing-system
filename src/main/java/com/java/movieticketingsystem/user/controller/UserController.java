@@ -37,11 +37,15 @@ public class UserController {
      * @return The details of the authenticated user.
      */
     @GetMapping("/self")
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<RestResponse> fetchSelfInfo() {
-        HashMap<String, Object> listHashMap = new HashMap<>();
-        listHashMap.put("user", userService.fetchSelfInfo());
-        return RestHelper.responseSuccess(listHashMap);
+        try {
+            HashMap<String, Object> listHashMap = new HashMap<>();
+            listHashMap.put("user", userService.fetchSelfInfo());
+             return RestHelper.responseSuccess(listHashMap);
+        } catch (Exception e) {
+            return RestHelper.responseError(e.getMessage());
+        }
     }
 
     /**
@@ -54,11 +58,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<RestResponse> findById(@PathVariable long id) {
         HashMap<String, Object> listHashMap = new HashMap<>();
-        listHashMap.put("user", userService.findById(id));
+        listHashMap.put("user", userService.fetchById(id));
         return RestHelper.responseSuccess(listHashMap);
     }
-
-
 
 
     /**
@@ -97,10 +99,14 @@ public class UserController {
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<RestResponse> updatePartial(
+    public ResponseEntity<RestResponse> updateUser(
             @PathVariable long id,
             @Validated @RequestBody UserUpdateDTO updateDTO) {
-        String message = userService.updatePartial(id, updateDTO);
+        if (!updateDTO.hasAtLeastOneField()) {
+            return RestHelper.responseError("At least one field must be provided for update");
+        }
+
+        String message = userService.update(id, updateDTO);
         return RestHelper.responseMessage(message);
     }
 

@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 
 public class UserInfoDetails implements UserDetails {
 
-    private String email;
-    private String password;
-    private List<GrantedAuthority> authorities;
+    private final String email;
+    private final String password;
+    private final List<GrantedAuthority> authorities;
 
     /**
      * Initializes the parameterized constructor

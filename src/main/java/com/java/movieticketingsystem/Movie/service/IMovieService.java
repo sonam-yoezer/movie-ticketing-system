@@ -1,5 +1,4 @@
-package com.java.movieticketingsystem.movie.service;
-
+package com.java.movieticketingsystem.Movie.service;
 
 import com.java.movieticketingsystem.movie.model.Movie;
 import com.java.movieticketingsystem.utils.IGenericCrudService;
@@ -7,6 +6,10 @@ import io.micrometer.common.lang.NonNull;
 
 public interface IMovieService extends IGenericCrudService<Long, Movie> {
     Movie save(@NonNull Movie movie);
+
+    String update(long id, Long entity);
+
+    Movie findById(long id);
 
     String update(Movie entity);
 

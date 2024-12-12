@@ -84,7 +84,7 @@ public class LoginService {
         }
     }
 
-    private HashMap<String, String> generateTokens(String username) {
+     private HashMap<String, String> generateTokens(String username) {
         HashMap<String, String> tokenMap = new HashMap<>();
         tokenMap.put("accessToken", jwtService.generateToken(username));
         tokenMap.put("refreshToken", jwtService.generateRefreshToken(username));

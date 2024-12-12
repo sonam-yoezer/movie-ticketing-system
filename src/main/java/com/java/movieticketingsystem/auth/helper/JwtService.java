@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String jwtSecret;
 
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiration;
@@ -65,7 +65,7 @@ public class JwtService {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -74,8 +74,8 @@ public class JwtService {
      *
      * @return The signing key
      */
-    private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(getSecret());
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -86,7 +86,11 @@ public class JwtService {
      * @return The username i.e. email of the authenticated token.
      */
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -119,7 +123,7 @@ public class JwtService {
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSignKey())
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -143,8 +147,14 @@ public class JwtService {
      * @return The flag indicating whether the token is valid or not.
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            return (username != null && 
+                   username.equals(userDetails.getUsername()) && 
+                   !isTokenExpired(token));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

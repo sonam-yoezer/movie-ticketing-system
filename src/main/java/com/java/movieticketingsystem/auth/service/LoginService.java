@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class LoginService {
 
+    @Autowired
     private UserInfoService userInfoService;
 
     @Autowired
@@ -44,22 +46,26 @@ public class LoginService {
         }
     }
 
-    public HashMap<String, String> refreshToken(String refreshToken) {
-        // Check if token is a refresh token
-        if (!isRefreshToken(refreshToken)) {
-            throw new GlobalExceptionWrapper.BadRequestException("Invalid Refresh Token.");
-        }
+    public Map<String, String> refreshToken(String refreshToken) {
+        try {
+            // Extract username from refresh token
+            String username = jwtService.extractUsername(refreshToken);
+            if (username == null) {
+                throw new GlobalExceptionWrapper.BadRequestException("Invalid Refresh Token.");
+            }
 
-        // Extract username from the refresh token
-        String username = jwtService.extractUsername(refreshToken);
-
-        // Validate the refresh token
-        UserDetails userDetails = userInfoService.loadUserByUsername(username);
-
-        if (jwtService.validateToken(refreshToken, userDetails)) {
-            return generateTokens(username);
-        } else {
-            throw new GlobalExceptionWrapper.BadRequestException("Invalid or Expired Refresh Token.");
+            // Load user details
+            UserDetails userDetails = userInfoService.loadUserByUsername(username);
+            
+            // Validate the refresh token
+            if (jwtService.validateToken(refreshToken, userDetails)) {
+                // Generate new tokens
+                return generateTokens(username);
+            } else {
+                throw new GlobalExceptionWrapper.BadRequestException("Invalid Refresh Token.");
+            }
+        } catch (Exception e) {
+            throw new GlobalExceptionWrapper.BadRequestException("Invalid Refresh Token: " + e.getMessage());
         }
     }
 

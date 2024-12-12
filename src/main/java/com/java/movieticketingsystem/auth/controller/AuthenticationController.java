@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/api/v1/login")
-public class LoginController {
+@RequestMapping("/api/v1/auth")
+public class AuthenticationController {
 
     @Autowired
     private LoginService loginService;
@@ -31,7 +31,7 @@ public class LoginController {
      * @param authRequest The authentication credentials containing object
      * @return The access keys and refresh keys for the associated authenticated user.
      */
-    @PostMapping()
+    @PostMapping("/login")
     public ResponseEntity<RestResponse> login(@RequestBody AuthRequest authRequest) {
         HashMap<String, Object> listHashMap = new HashMap<>(loginService.authenticate(authRequest));
         return RestHelper.responseSuccess(listHashMap);

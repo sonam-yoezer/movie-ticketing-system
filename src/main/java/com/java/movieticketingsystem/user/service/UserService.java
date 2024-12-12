@@ -22,7 +22,7 @@ import java.util.Optional;
 import static com.java.movieticketingsystem.utils.constants.UserConstants.*;
 
 @Service
-public class UserService implements IUserService {
+public class     UserService implements IUserService {
     @Autowired
     private PasswordEncoder encoder;
     @Autowired

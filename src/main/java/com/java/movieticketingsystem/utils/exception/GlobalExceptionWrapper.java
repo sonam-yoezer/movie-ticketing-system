@@ -1,6 +1,7 @@
 package com.java.movieticketingsystem.utils.exception;
 
 import com.java.movieticketingsystem.utils.RestResponse;
+import com.java.movieticketingsystem.utils.constants.ExceptionConstants;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,6 +84,42 @@ public class GlobalExceptionWrapper {
     public static class UnauthorizedException extends RuntimeException implements IGlobalException {
         public UnauthorizedException(String message) {
             super(message);
+        }
+
+        @Override
+        public ResponseEntity<RestResponse> getResponse(Exception exception) {
+            RestResponse restResponse = setErrorResponse(exception);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(restResponse);
+        }
+    }
+
+    public static class UnauthorizedAccessException extends RuntimeException implements IGlobalException {
+        public UnauthorizedAccessException(String message) {
+            super(message);
+        }
+
+        @Override
+        public ResponseEntity<RestResponse> getResponse(Exception exception) {
+            RestResponse restResponse = setErrorResponse(exception);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(restResponse);
+        }
+    }
+
+    public static class TokenExpiredException extends RuntimeException implements IGlobalException {
+        public TokenExpiredException(String message) {
+            super(message);
+        }
+
+        @Override
+        public ResponseEntity<RestResponse> getResponse(Exception exception) {
+            RestResponse restResponse = setErrorResponse(exception);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(restResponse);
+        }
+    }
+
+    public static class UnauthorizedMovieOperationException extends RuntimeException implements IGlobalException {
+        public UnauthorizedMovieOperationException() {
+            super(ExceptionConstants.UNAUTHORIZED_MOVIE_OPERATION);
         }
 
         @Override

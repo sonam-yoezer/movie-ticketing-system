@@ -1,0 +1,60 @@
+# Docker Compose file for Course Manager Application
+# Supports MySQL database and Spring Boot application deployment
+services:
+  # Spring Boot Application Service
+  # Configures the main application container
+  app:
+    # Build configuration using local Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Container naming and identification
+    container_name: movie-ticketing-system-backend
+    # Port mapping for external access
+    ports:
+      - "8081:8081"
+    # Ensure database is ready before starting the app
+    depends_on:
+      - mysql
+    # Environment variables to match application.properties
+    environment:
+      # Database connection configurations
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      # JPA and Hibernate configurations
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_DATABASE-PLATFORM=org.hibernate.dialect.MySQL8Dialect
+      # Logging configurations
+      - SPRING_JPA_SHOW-SQL=false
+      - LOGGING_LEVEL_ORG_HIBERNATE_SQL=DEBUG
+      - LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER=TRACE
+      # JWT configurations
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_TOKEN_EXPIRATION=300000
+      - JWT_REFRESH_TOKEN_EXPIRATION=604800000
+      # CORS configurations
+      - CORS_ORIGIN_URL=${CORS_ORIGIN_URL}
+  # MySQL Database Service
+  # Configures the database container
+  mysql:
+    # Use latest MySQL 8 image
+    image: mysql:8.0
+    # Container naming and identification
+    container_name: movie-ticketing-system-db
+    # Port mapping for database access
+    ports:
+      - "${MYSQL_PORT}:3306"
+    # Environment variables for database setup
+    environment:
+      # Database initialization parameters
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ALLOW_EMPTY_PASSWORD=${MYSQL_ALLOW_EMPTY_PASSWORD}
+    # Persistent volume for database data
+    volumes:
+      - movie-ticketing-system-mysql-data:/var/lib/mysql
+# Persistent volume definitions
+# Ensures data persistence across container restarts
+volumes:
+  movie-ticketing-system-mysql-data:

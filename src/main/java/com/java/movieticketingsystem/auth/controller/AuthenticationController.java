@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -33,7 +34,7 @@ public class AuthenticationController {
      */
     @PostMapping("/login")
     public ResponseEntity<RestResponse> login(@RequestBody AuthRequest authRequest) {
-        HashMap<String, Object> listHashMap = new HashMap<>(loginService.authenticate(authRequest));
+        Map<String, Object> listHashMap = new HashMap<>(loginService.authenticate(authRequest));
         return RestHelper.responseSuccess(listHashMap);
     }
 
@@ -47,7 +48,7 @@ public class AuthenticationController {
     public ResponseEntity<RestResponse> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         // Extract token from Bearer authorization header
         String refreshToken = authorizationHeader.substring(7); // Remove "Bearer "
-        HashMap<String, Object> tokenMap = new HashMap<>(loginService.refreshToken(refreshToken));
+        Map<String, Object> tokenMap = new HashMap<>(loginService.refreshToken(refreshToken));
         return RestHelper.responseSuccess(tokenMap);
     }
 
@@ -59,7 +60,7 @@ public class AuthenticationController {
      */
     @PostMapping("/sign-up")
     public ResponseEntity<RestResponse> save(@Validated @RequestBody User user) {
-        HashMap<String, Object> listHashMap = new HashMap<>();
+        Map<String, Object> listHashMap = new HashMap<>();
         listHashMap.put("user", userService.save(user));
         return RestHelper.responseSuccess(listHashMap);
     }

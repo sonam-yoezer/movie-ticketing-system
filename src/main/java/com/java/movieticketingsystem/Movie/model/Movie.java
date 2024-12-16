@@ -1,4 +1,4 @@
-package com.java.movieticketingsystem.movie.model;
+package com.java.movieticketingsystem.Movie.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Table(name = "movie")
-public class Movie {
+public class  Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

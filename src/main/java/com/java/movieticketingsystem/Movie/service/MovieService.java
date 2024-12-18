@@ -1,8 +1,8 @@
 package com.java.movieticketingsystem.Movie.service;
 
 import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
-import com.java.movieticketingsystem.movie.model.Movie;
-import com.java.movieticketingsystem.movie.repository.MovieRepository;
+import com.java.movieticketingsystem.Movie.model.Movie;
+import com.java.movieticketingsystem.Movie.repository.MovieRepository;
 import com.java.movieticketingsystem.utils.constants.MovieConstants;
 import io.micrometer.common.lang.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -16,7 +16,7 @@ public interface IUserService extends IGenericCrudService<User, UserDTO> {
      *
      * @return The user dto
      */
-    User fetchSelfInfo();
+    UserDTO fetchSelfInfo();
 
     String update(long id, @NonNull UserDTO userDTO);
 

@@ -1,6 +1,6 @@
 package com.java.movieticketingsystem.Movie.service;
 
-import com.java.movieticketingsystem.movie.model.Movie;
+import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.utils.IGenericCrudService;
 import io.micrometer.common.lang.NonNull;
 

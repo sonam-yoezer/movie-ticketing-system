@@ -1,6 +1,7 @@
 package com.java.movieticketingsystem.user.controller;
 
 import com.java.movieticketingsystem.user.model.User;
+import com.java.movieticketingsystem.user.model.UserDTO;
 import com.java.movieticketingsystem.user.model.UserUpdateDTO;
 import com.java.movieticketingsystem.user.service.UserService;
 import com.java.movieticketingsystem.utils.RestHelper;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,6 +21,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
     /**
      * Signing up the new user.
      *
@@ -27,10 +30,11 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<RestResponse> save(@Validated @RequestBody User user) {
-        HashMap<String, Object> listHashMap = new HashMap<>();
+        Map<String, Object> listHashMap = new HashMap<>();
         listHashMap.put("user", userService.save(user));
         return RestHelper.responseSuccess(listHashMap);
     }
+
     /**
      * Fetch self info of the User
      *
@@ -40,9 +44,9 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<RestResponse> fetchSelfInfo() {
         try {
-            HashMap<String, Object> listHashMap = new HashMap<>();
+            Map<String, Object> listHashMap = new HashMap<>();
             listHashMap.put("user", userService.fetchSelfInfo());
-             return RestHelper.responseSuccess(listHashMap);
+            return RestHelper.responseSuccess(listHashMap);
         } catch (Exception e) {
             return RestHelper.responseError(e.getMessage());
         }
@@ -57,7 +61,7 @@ public class UserController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<RestResponse> findById(@PathVariable long id) {
-        HashMap<String, Object> listHashMap = new HashMap<>();
+        Map<String, Object> listHashMap = new HashMap<>();
         listHashMap.put("user", userService.fetchById(id));
         return RestHelper.responseSuccess(listHashMap);
     }
@@ -77,7 +81,6 @@ public class UserController {
     }
 
 
-
     /**
      * Deletes the user by id.
      *
@@ -85,29 +88,33 @@ public class UserController {
      * @return The message indicating the confirmation on deleted user entity.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<RestResponse> delete(@PathVariable long id) {
-        String message = userService.deleteById(id);
-        return RestHelper.responseMessage(message);
+        try {
+            String message = userService.deleteById(id);
+            return RestHelper.responseMessage(message);
+        } catch (Exception e) {
+            return RestHelper.responseError(e.getMessage());
+        }
     }
 
     /**
      * Updates partial information of the user.
-     * @param id The user id to update
-     * @param updateDTO The DTO containing fields to update
+     *
+     * @param id      The user id to update
+     * @param userDTO The DTO containing fields to update
      * @return Response containing update confirmation message
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<RestResponse> updateUser(
             @PathVariable long id,
-            @Validated @RequestBody UserUpdateDTO updateDTO) {
-        if (!updateDTO.hasAtLeastOneField()) {
-            return RestHelper.responseError("At least one field must be provided for update");
+            @Validated @RequestBody UserDTO userDTO) {  // Changed from UserUpdateDTO to UserDTO
+        try {
+            String message = userService.update(id, userDTO);
+            return RestHelper.responseMessage(message);
+        } catch (Exception e) {
+            return RestHelper.responseError(e.getMessage());
         }
-
-        String message = userService.update(id, updateDTO);
-        return RestHelper.responseMessage(message);
     }
-
 }

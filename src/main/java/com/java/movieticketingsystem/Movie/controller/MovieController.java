@@ -1,7 +1,7 @@
 package com.java.movieticketingsystem.Movie.controller;
 
+import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.Movie.service.MovieService;
-import com.java.movieticketingsystem.movie.model.Movie;
 import com.java.movieticketingsystem.utils.constants.MovieConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

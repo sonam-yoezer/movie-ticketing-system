@@ -37,6 +37,7 @@ public class JwtService {
      */
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "access");
         return createToken(claims, username, accessTokenExpiration);
     }
 
@@ -48,6 +49,7 @@ public class JwtService {
      */
     public String generateRefreshToken(String username) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "refresh");
         return createToken(claims, username, refreshTokenExpiration);
     }
 
@@ -121,7 +123,7 @@ public class JwtService {
      * @param token The token supplied
      * @return The claims of authenticated user.
      */
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()

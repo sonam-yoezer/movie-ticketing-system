@@ -4,8 +4,10 @@ import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
 import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.Movie.repository.MovieRepository;
 import com.java.movieticketingsystem.utils.constants.MovieConstants;
+import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper;
 import io.micrometer.common.lang.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +19,15 @@ public class MovieService implements IMovieService {
 
 
     @Override
-    public Movie save(@NonNull Movie movie) {
-        return movieRepository.save(movie);
+    public Movie save(@NonNull Movie movie){
+        try {
+            if (movieRepository.existsByMovieName(movie.getMovieName())){
+                throw new GlobalExceptionWrapper.BadRequestException("Movie with name '" + movie.getMovieName() + "' already exists ");
+            }
+            return movieRepository.save(movie);
+        } catch (DataIntegrityViolationException e) {
+            throw new GlobalExceptionWrapper.BadRequestException("Movie with this name already exists");
+        }
     }
 
     @Override
@@ -50,9 +59,9 @@ public class MovieService implements IMovieService {
 
     @Override
     public Movie findById(long id) {
-        // Fetch movie by ID or throw IllegalArgumentException with a constant message
         return movieRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(MovieConstants.NOT_FOUND));
+                .orElseThrow(() -> new GlobalExceptionWrapper.NotFoundException(
+                        String.format("Movie not found with id: %d", id)));
     }
 
     @Override

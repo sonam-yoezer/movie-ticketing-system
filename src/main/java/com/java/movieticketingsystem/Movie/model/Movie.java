@@ -30,6 +30,8 @@ public class  Movie {
     @Column(nullable = false)
     private String duration;
 
+    private String venue;
+
     private String description;
 
     //getter and setter method for update
@@ -65,6 +67,5 @@ public class  Movie {
     public void setDescription(String description){
         this.description = description;
     }
+
 }
-
-

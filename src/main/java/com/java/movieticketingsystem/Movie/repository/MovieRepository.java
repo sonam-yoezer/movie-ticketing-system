@@ -13,4 +13,7 @@ public interface MovieRepository extends JpaRepository<Movie,Long> {
        By extending JpaRepository, your repository inherits all these methods, saving you time and reducing the
       amount of code you have to write for database interactions.
      */
+
+    boolean existsByMovieName(String movieName);
+
 }

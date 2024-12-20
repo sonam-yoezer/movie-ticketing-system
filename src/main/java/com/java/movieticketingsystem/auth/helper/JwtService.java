@@ -88,11 +88,7 @@ public class JwtService {
      * @return The username i.e. email of the authenticated token.
      */
     public String extractUsername(String token) {
-        try {
-            return extractClaim(token, Claims::getSubject);
-        } catch (Exception e) {
-            return null;
-        }
+        return extractClaim(token, Claims::getSubject);
     }
 
     /**
@@ -149,14 +145,7 @@ public class JwtService {
      * @return The flag indicating whether the token is valid or not.
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
-        try {
-            final String username = extractUsername(token);
-            return (username != null && 
-                   username.equals(userDetails.getUsername()) && 
-                   !isTokenExpired(token));
-        } catch (Exception e) {
-            return false;
-        }
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
 }

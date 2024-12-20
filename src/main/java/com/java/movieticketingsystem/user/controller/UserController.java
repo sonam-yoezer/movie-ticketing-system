@@ -43,13 +43,9 @@ public class UserController {
     @GetMapping("/self")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<RestResponse> fetchSelfInfo() {
-        try {
-            Map<String, Object> listHashMap = new HashMap<>();
-            listHashMap.put("user", userService.fetchSelfInfo());
-            return RestHelper.responseSuccess(listHashMap);
-        } catch (Exception e) {
-            return RestHelper.responseError(e.getMessage());
-        }
+        Map<String, Object> listHashMap = new HashMap<>();
+        listHashMap.put("user", userService.fetchSelfInfo());
+        return RestHelper.responseSuccess(listHashMap);
     }
 
     /**

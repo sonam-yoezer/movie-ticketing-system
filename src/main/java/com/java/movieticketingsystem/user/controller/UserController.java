@@ -49,6 +49,20 @@ public class UserController {
     }
 
     /**
+     * Fetches all the user entities in the system.
+     *
+     * @return The list of user entities.
+     */
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<RestResponse> findAll() {
+        Map<String, Object> listHashMap = new HashMap<>();
+        listHashMap.put("enabledUsers", userService.findAll());
+        listHashMap.put("disabledUsers", userService.findAllDisabled());
+        return RestHelper.responseSuccess(listHashMap);
+    }
+
+    /**
      * Fetches the user by identifier.
      *
      * @param id The unique identifier of the instructor.
@@ -62,19 +76,6 @@ public class UserController {
         return RestHelper.responseSuccess(listHashMap);
     }
 
-
-    /**
-     * Fetches all the user entities in the system.
-     *
-     * @return The list of user entities.
-     */
-    @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RestResponse> findAll() {
-        HashMap<String, Object> listHashMap = new HashMap<>();
-        listHashMap.put("user", userService.findAll());
-        return RestHelper.responseSuccess(listHashMap);
-    }
 
 
     /**
@@ -113,4 +114,25 @@ public class UserController {
             return RestHelper.responseError(e.getMessage());
         }
     }
+
+       /**
+    * Disables the user by id.
+    *
+    * @param id The unique identifier of the entity.
+    * @return The message indicating the confirmation on disabled user entity.
+    */
+       @PutMapping("/{id}/disable")
+       @PreAuthorize("hasAuthority('ADMIN')")
+       public ResponseEntity<RestResponse> disableUser(@PathVariable long id) {
+           String message = userService.updateUserStatus(id, false); // Disable user
+           return RestHelper.responseMessage(message);
+       }
+
+        @PutMapping("/{id}/enable")
+        @PreAuthorize("hasAuthority('ADMIN')")
+        public ResponseEntity<RestResponse> enableUser(@PathVariable long id) {
+            String message = userService.updateUserStatus(id, true); // Enable user
+            return RestHelper.responseMessage(message);
+        }
+
 }

@@ -33,8 +33,12 @@ public class UserService implements IUserService {
 
     @Override
     public List<UserDTO> findAll() {
-        List<User> user = this.userRepository.findAll();
-        return UserMapper.toDTO(user);
+        List<User> activeUsers = this.userRepository.findByEnabledTrue();
+        return UserMapper.toDTO(activeUsers);
+    }
+    public List<UserDTO> findAllDisabled() {
+        List<User> disabledUsers = this.userRepository.findByEnabledFalse();
+        return UserMapper.toDTO(disabledUsers);
     }
 
     @Override
@@ -138,6 +142,14 @@ public class UserService implements IUserService {
         User userToDelete = findById(id);
         userRepository.delete(userToDelete);
         return String.format(DELETED_SUCCESSFULLY_MESSAGE, USER);
+    }
+
+    public String updateUserStatus(long id, boolean isEnabled) {
+        User user = findById(id);
+        user.setEnabled(isEnabled);
+        userRepository.save(user);
+        String statusMessage = isEnabled ? ENABLED_SUCCESSFULLY_MESSAGE : DISABLED_SUCCESSFULLY_MESSAGE;
+        return String.format(statusMessage, user.getName()); // Assuming User has a `getUsername` method
     }
 
 }

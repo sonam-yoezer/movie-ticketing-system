@@ -1,5 +1,6 @@
 package com.java.movieticketingsystem.auth.model;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 @AllArgsConstructor
@@ -24,4 +25,5 @@ public class AuthRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

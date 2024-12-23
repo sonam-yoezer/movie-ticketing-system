@@ -13,6 +13,7 @@ public class UserInfoDetails implements UserDetails {
 
     private final String email;
     private final String password;
+    private final boolean enabled;
     private final List<GrantedAuthority> authorities;
 
     /**
@@ -23,6 +24,7 @@ public class UserInfoDetails implements UserDetails {
     public UserInfoDetails(User userInfo) {
         this.email = userInfo.getEmail();
         this.password = userInfo.getPassword();
+        this.enabled = userInfo.isEnabled(); // Map the enabled status
         this.authorities = List.of(userInfo.getRoles().split(","))
                 .stream()
                 .map(SimpleGrantedAuthority::new)

@@ -2,6 +2,7 @@ package com.java.movieticketingsystem.auth.service;
 
 import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
 import com.java.movieticketingsystem.auth.helper.JwtService;
+import com.java.movieticketingsystem.auth.helper.UserInfoDetails;
 import com.java.movieticketingsystem.auth.helper.UserInfoService;
 import com.java.movieticketingsystem.auth.model.AuthRequest;
 import com.java.movieticketingsystem.user.model.User;
@@ -10,9 +11,6 @@ import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,20 +31,37 @@ public class LoginService {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private PasswordEncoder encoder;
 
     /**
-     * Authenticates the user provided credentials.
+     * Authenticates the user-provided credentials.
      *
-     * @param authRequest The user provided credentials.
+     * @param authRequest The user-provided credentials.
      * @return The token on validating the user.
      */
     public Map<String, String> authenticate(@NonNull AuthRequest authRequest) {
         Optional<User> selectedUser = userService.findByEmail(authRequest.getEmail());
-        if (selectedUser.isEmpty() || !encoder.matches(authRequest.getPassword(), selectedUser.get().getPassword())) {
+
+        // Check if user exists
+        if (selectedUser.isEmpty()) {
             throw new GlobalExceptionWrapper.NotFoundException("Invalid Credentials.");
         }
+
+        User user = selectedUser.get();
+
+        // Check if the password is correct
+        if (!encoder.matches(authRequest.getPassword(), user.getPassword())) {
+            throw new GlobalExceptionWrapper.NotFoundException("Invalid Credentials.");
+        }
+
+        // Check if the user is enabled
+        if (!user.isEnabled()) {
+            throw new GlobalExceptionWrapper.BadRequestException("User account is disabled. Please contact support.");
+        }
+
+        // Generate tokens
         return generateTokens(authRequest.getEmail());
     }
 
@@ -67,7 +82,7 @@ public class LoginService {
     }
 
     /**
-     * Generates the token for provided username.
+     * Generates the token for the provided username.
      *
      * @param username The username for the provided token.
      * @return The map of token types and tokens.
@@ -99,12 +114,11 @@ public class LoginService {
 
         if (jwtService.validateToken(refreshToken, userDetails)) {
             Map<String, String> tokens = generateTokens(username);
-            //Omit refreshing of refresh tokens
+            // Omit refreshing of refresh tokens
             tokens.put("refreshToken", refreshToken);
             return tokens;
         } else {
             throw new GlobalExceptionWrapper.BadRequestException("Invalid or Expired Refresh Token.");
         }
     }
-
 }

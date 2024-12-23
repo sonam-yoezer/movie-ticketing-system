@@ -43,6 +43,9 @@ public class User extends AuditEntity {
 
     private String roles;
 
+    @Column(nullable = false)
+    private boolean enabled = true;
+
     public long getId() {
         return id;
     }
@@ -90,5 +93,13 @@ public class User extends AuditEntity {
 
     public void setRoles(String roles) {
         this.roles = roles;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

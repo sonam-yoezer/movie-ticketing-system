@@ -59,12 +59,13 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')") // Only admin can create movies
     public ResponseEntity<String> deleteMovieById(@PathVariable long id) {
         try {
             movieService.deleteById(id);
-            return ResponseEntity.ok("Movie deleted successfully."); // Return 200 OK with success message
+            return ResponseEntity.ok("Movie deleted successfully.");
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(MovieConstants.NOT_FOUND); // Return 404 if the movie is not found
+            return ResponseEntity.status(404).body("Movie not found.");
         }
     }
 

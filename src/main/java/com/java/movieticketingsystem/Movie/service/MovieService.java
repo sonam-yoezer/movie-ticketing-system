@@ -71,9 +71,14 @@ public class MovieService implements IMovieService {
 
     @Override
     public String deleteById(long id) {
+        // Fetch the movie by ID. Throws an exception if not found.
         Movie movie = findById(id);
+
+        // Delete the movie using the repository.
         movieRepository.delete(movie);
-        return null;
+
+        // Return a success message.
+        return "Movie with ID " + id + " has been deleted successfully.";
     }
 
     @Override

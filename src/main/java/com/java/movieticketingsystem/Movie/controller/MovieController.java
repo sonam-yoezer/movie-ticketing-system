@@ -2,6 +2,9 @@ package com.java.movieticketingsystem.Movie.controller;
 
 import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.Movie.service.MovieService;
+import com.java.movieticketingsystem.theatre.model.Theatre;
+import com.java.movieticketingsystem.theatre.repository.TheatreRepository;
+import com.java.movieticketingsystem.theatre.service.TheatreService;
 import com.java.movieticketingsystem.utils.RestHelper;
 import com.java.movieticketingsystem.utils.RestResponse;
 import com.java.movieticketingsystem.utils.constants.MovieConstants;
@@ -22,18 +25,38 @@ public class MovieController {
     @Autowired
     private MovieService movieService;
 
+    @Autowired
+    private TheatreService theatreService;
+
+    @Autowired
+    private TheatreRepository theatreRepository;
+
+
+    @GetMapping("/theaters")
+    public ResponseEntity<List<Theatre>> findAll() {
+        return ResponseEntity.ok(theatreService.findAll()); // Return theater list in JSON
+    }
+
+
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')") // Only admin can create movies
-    public ResponseEntity<RestResponse> saveMovie(@Validated @RequestBody Movie movie){
-        try{
-            Movie savedMovie = movieService.save(movie);
-            Map<String, Object> response = new HashMap<>();
-            response.put("movie", savedMovie);
-            return RestHelper.responseSuccess(response);
-        } catch (Exception e){
-            return RestHelper.responseError(e.getMessage());
+    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
+        if (movie.getTheatre() == null) {
+            throw new RuntimeException("Theatre information is missing.");
         }
+
+        // Fetch the Theatre object by ID
+        Theatre theatre = theatreRepository.findById(movie.getTheatre().getId())
+                .orElseThrow(() -> new RuntimeException("Theatre with ID " + movie.getTheatre().getId() + " does not exist."));
+
+        // Set the Theatre in the Movie
+        movie.setTheatre(theatre);
+
+        // Save the Movie with the associated Theatre
+        Movie savedMovie = movieService.save(movie);
+        return ResponseEntity.ok(savedMovie);
     }
+
 
     @GetMapping
     public ResponseEntity<List<Movie>> getAllMovies() {

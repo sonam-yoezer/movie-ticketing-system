@@ -1,11 +1,14 @@
 package com.java.movieticketingsystem.theatre.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.java.movieticketingsystem.Movie.model.Movie;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.lang.annotation.Inherited;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -14,8 +17,8 @@ import java.lang.annotation.Inherited;
 @Table(name = "theatre")
 public class Theatre {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -29,4 +32,57 @@ public class Theatre {
     private String facilities;
 
     private String contactDetails;
+
+    @OneToMany(mappedBy = "theatre")
+    @JsonIgnore
+    private List<Movie> movies;
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public int getSeatingCapacity() {
+        return seatingCapacity;
+    }
+
+    public void setSeatingCapacity(int seatingCapacity) {
+        this.seatingCapacity = seatingCapacity;
+    }
+
+    public String getFacilities() {
+        return facilities;
+    }
+
+    public void setFacilities(String facilities) {
+        this.facilities = facilities;
+    }
+
+    public String getContactDetails() {
+        return contactDetails;
+    }
+
+    public void setContactDetails(String contactDetails) {
+        this.contactDetails = contactDetails;
+    }
 }

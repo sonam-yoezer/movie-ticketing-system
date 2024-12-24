@@ -3,12 +3,17 @@ package com.java.movieticketingsystem.Movie.service;
 import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
 import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.Movie.repository.MovieRepository;
+import com.java.movieticketingsystem.theatre.model.Theatre;
+import com.java.movieticketingsystem.theatre.repository.TheatreRepository;
+import com.java.movieticketingsystem.theatre.service.TheatreService;
 import com.java.movieticketingsystem.utils.constants.MovieConstants;
 import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper;
 import io.micrometer.common.lang.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -17,6 +22,15 @@ public class MovieService implements IMovieService {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private TheatreService theatreService;
+
+    @GetMapping("/add")
+    public String showAddMovieForm(Model model) {
+        model.addAttribute("theaters", theatreService.findAll()); // Add theater list to the model
+        model.addAttribute("movie", new Movie()); // Add empty movie object
+        return "addMovie"; // Thymeleaf template name
+    }
 
     @Override
     public Movie save(@NonNull Movie movie){

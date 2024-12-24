@@ -1,5 +1,6 @@
 package com.java.movieticketingsystem.Movie.model;
 
+import com.java.movieticketingsystem.theatre.model.Theatre;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,25 @@ public class  Movie {
     @Column(nullable = false)
     private String duration;
 
-    private String venue;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "theatre_id", nullable = false)
+    private Theatre theatre;
+
+    public Theatre getTheatre() {
+        return theatre;
+    }
+
+    public void setTheatre(Theatre theatre) {
+        this.theatre = theatre;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     private String description;
 

@@ -13,12 +13,13 @@ import java.util.List;
 
 @Service
 public class TheatreService implements ITheatreService {
-    
+
     @Autowired
     private TheatreRepository theatreRepository;
 
     @Override
     public List<Theatre> findAll() {
+        // Fetch all theaters from the database
         return theatreRepository.findAll();
     }
 

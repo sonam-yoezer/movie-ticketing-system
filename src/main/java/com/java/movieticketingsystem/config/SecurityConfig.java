@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // Allow CORS
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/sign-up").permitAll() // Public endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/sign-up", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll() // Public endpoints
                         .anyRequest().authenticated() // Protect all other endpoints
                 )
                 .sessionManagement(session -> session

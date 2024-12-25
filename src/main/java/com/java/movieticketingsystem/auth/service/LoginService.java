@@ -1,12 +1,10 @@
 package com.java.movieticketingsystem.auth.service;
 
-import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
 import com.java.movieticketingsystem.auth.helper.JwtService;
-import com.java.movieticketingsystem.auth.helper.UserInfoDetails;
 import com.java.movieticketingsystem.auth.helper.UserInfoService;
 import com.java.movieticketingsystem.auth.model.AuthRequest;
 import com.java.movieticketingsystem.user.model.User;
-import com.java.movieticketingsystem.user.service.UserService;
+import com.java.movieticketingsystem.user.service.UserServiceImpl;
 import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
@@ -15,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +27,7 @@ public class LoginService {
     private JwtService jwtService;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -42,7 +39,7 @@ public class LoginService {
      * @return The token on validating the user.
      */
     public Map<String, String> authenticate(@NonNull AuthRequest authRequest) {
-        Optional<User> selectedUser = userService.findByEmail(authRequest.getEmail());
+        Optional<User> selectedUser = userServiceImpl.findByEmail(authRequest.getEmail());
 
         // Check if user exists
         if (selectedUser.isEmpty()) {

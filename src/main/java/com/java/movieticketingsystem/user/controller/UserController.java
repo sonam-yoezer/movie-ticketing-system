@@ -2,8 +2,7 @@ package com.java.movieticketingsystem.user.controller;
 
 import com.java.movieticketingsystem.user.model.User;
 import com.java.movieticketingsystem.user.model.UserDTO;
-import com.java.movieticketingsystem.user.model.UserUpdateDTO;
-import com.java.movieticketingsystem.user.service.UserService;
+import com.java.movieticketingsystem.user.service.UserServiceImpl;
 import com.java.movieticketingsystem.utils.RestHelper;
 import com.java.movieticketingsystem.utils.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     /**
      * Signing up the new user.
@@ -31,7 +30,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<RestResponse> save(@Validated @RequestBody User user) {
         Map<String, Object> listHashMap = new HashMap<>();
-        listHashMap.put("user", userService.save(user));
+        listHashMap.put("user", userServiceImpl.save(user));
         return RestHelper.responseSuccess(listHashMap);
     }
 
@@ -44,7 +43,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<RestResponse> fetchSelfInfo() {
         Map<String, Object> listHashMap = new HashMap<>();
-        listHashMap.put("user", userService.fetchSelfInfo());
+        listHashMap.put("user", userServiceImpl.fetchSelfInfo());
         return RestHelper.responseSuccess(listHashMap);
     }
 
@@ -57,8 +56,8 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<RestResponse> findAll() {
         Map<String, Object> listHashMap = new HashMap<>();
-        listHashMap.put("enabledUsers", userService.findAll());
-        listHashMap.put("disabledUsers", userService.findAllDisabled());
+        listHashMap.put("enabledUsers", userServiceImpl.findAll());
+        listHashMap.put("disabledUsers", userServiceImpl.findAllDisabled());
         return RestHelper.responseSuccess(listHashMap);
     }
 
@@ -72,7 +71,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<RestResponse> findById(@PathVariable long id) {
         Map<String, Object> listHashMap = new HashMap<>();
-        listHashMap.put("user", userService.fetchById(id));
+        listHashMap.put("user", userServiceImpl.fetchById(id));
         return RestHelper.responseSuccess(listHashMap);
     }
 
@@ -88,7 +87,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<RestResponse> delete(@PathVariable long id) {
         try {
-            String message = userService.deleteById(id);
+            String message = userServiceImpl.deleteById(id);
             return RestHelper.responseMessage(message);
         } catch (Exception e) {
             return RestHelper.responseError(e.getMessage());
@@ -108,7 +107,7 @@ public class UserController {
             @PathVariable long id,
             @Validated @RequestBody UserDTO userDTO) {  // Changed from UserUpdateDTO to UserDTO
         try {
-            String message = userService.update(id, userDTO);
+            String message = userServiceImpl.update(id, userDTO);
             return RestHelper.responseMessage(message);
         } catch (Exception e) {
             return RestHelper.responseError(e.getMessage());
@@ -124,14 +123,14 @@ public class UserController {
        @PutMapping("/{id}/disable")
        @PreAuthorize("hasAuthority('ADMIN')")
        public ResponseEntity<RestResponse> disableUser(@PathVariable long id) {
-           String message = userService.updateUserStatus(id, false); // Disable user
+           String message = userServiceImpl.updateUserStatus(id, false); // Disable user
            return RestHelper.responseMessage(message);
        }
 
         @PutMapping("/{id}/enable")
         @PreAuthorize("hasAuthority('ADMIN')")
         public ResponseEntity<RestResponse> enableUser(@PathVariable long id) {
-            String message = userService.updateUserStatus(id, true); // Enable user
+            String message = userServiceImpl.updateUserStatus(id, true); // Enable user
             return RestHelper.responseMessage(message);
         }
 

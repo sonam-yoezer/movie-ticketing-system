@@ -1,7 +1,7 @@
 package com.java.movieticketingsystem.Movie.controller;
 
 import com.java.movieticketingsystem.Movie.model.Movie;
-import com.java.movieticketingsystem.Movie.service.MovieService;
+import com.java.movieticketingsystem.Movie.service.MovieServiceImpl;
 import com.java.movieticketingsystem.theatre.model.Theatre;
 import com.java.movieticketingsystem.theatre.repository.TheatreRepository;
 import com.java.movieticketingsystem.theatre.service.TheatreService;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class MovieController {
 
     @Autowired
-    private MovieService movieService;
+    private MovieServiceImpl movieServiceImpl;
 
     @Autowired
     private TheatreService theatreService;
@@ -53,14 +53,14 @@ public class MovieController {
         movie.setTheatre(theatre);
 
         // Save the Movie with the associated Theatre
-        Movie savedMovie = movieService.save(movie);
+        Movie savedMovie = movieServiceImpl.save(movie);
         return ResponseEntity.ok(savedMovie);
     }
 
 
     @GetMapping
     public ResponseEntity<List<Movie>> getAllMovies() {
-        List<Movie> movies = movieService.findAll();
+        List<Movie> movies = movieServiceImpl.findAll();
         if (movies.isEmpty()) {
             return ResponseEntity.noContent().build(); // Return 204 No Content if no movies found
         }
@@ -72,7 +72,7 @@ public class MovieController {
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')") // Allow both USER and ADMIN roles
     public ResponseEntity<RestResponse> getMovieId(@PathVariable long id){
         try {
-            Movie movie = movieService.findById(id);
+            Movie movie = movieServiceImpl.findById(id);
             Map<String, Object> response = new HashMap<>();
             response.put("movie", movie);
             return RestHelper.responseSuccess(response);
@@ -85,7 +85,7 @@ public class MovieController {
     @PreAuthorize("hasAuthority('ADMIN')") // Only admin can create movies
     public ResponseEntity<String> deleteMovieById(@PathVariable long id) {
         try {
-            movieService.deleteById(id);
+            movieServiceImpl.deleteById(id);
             return ResponseEntity.ok("Movie deleted successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(404).body("Movie not found.");
@@ -94,7 +94,7 @@ public class MovieController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @Validated @RequestBody Movie movieDetails) {
-        Movie updatedMovie = movieService.updateMovie(id, movieDetails);
+        Movie updatedMovie = movieServiceImpl.updateMovie(id, movieDetails);
         return ResponseEntity.ok(updatedMovie);
     }
 

@@ -17,8 +17,14 @@ import java.util.List;
 @Table(name = "theatre")
 public class Theatre {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    // ... other theatre fields
+
+    public Theatre(String id) { // String constructor
+        this.id = Long.parseLong(id); // Parse the string ID to long
+    }
 
     @Column(nullable = false, unique = true)
     private String name;

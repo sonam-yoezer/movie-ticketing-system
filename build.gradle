@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.5'
-	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.springframework.boot' version '3.2.3'
+	id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.java'
@@ -28,7 +28,7 @@ dependencies {
 	// Hibernate Validator for validation annotations
 	implementation 'org.hibernate.validator:hibernate-validator'
 
-	implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
+	implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
@@ -40,7 +40,12 @@ dependencies {
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-common:2.3.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+	testImplementation 'org.mockito:mockito-core:5.10.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
 
 }
 

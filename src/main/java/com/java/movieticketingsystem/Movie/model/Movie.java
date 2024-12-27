@@ -1,5 +1,6 @@
 package com.java.movieticketingsystem.Movie.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.java.movieticketingsystem.theatre.model.Theatre;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class  Movie {
 
     @CreationTimestamp
     @Column(updatable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime releaseDate;
 
     @Column(nullable = false)

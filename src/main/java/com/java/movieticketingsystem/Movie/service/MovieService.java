@@ -33,16 +33,36 @@ public class MovieService implements IMovieService {
     }
 
     @Override
-    public Movie save(@NonNull Movie movie){
+    public Movie save(@NonNull Movie movie) {
         try {
-            if (movieRepository.existsByMovieName(movie.getMovieName())){
-                throw new GlobalExceptionWrapper.BadRequestException("Movie with name '" + movie.getMovieName() + "' already exists ");
+            // Check for missing fields
+            if (movie.getMovieName() == null || movie.getMovieName().isEmpty()) {
+                throw new GlobalExceptionWrapper.BadRequestException("Movie name is missing.");
             }
+            if (movie.getGenre() == null || movie.getGenre().isEmpty()) {
+                throw new GlobalExceptionWrapper.BadRequestException("Movie genre is missing.");
+            }
+            if (movie.getShowTime() == null) {
+                throw new GlobalExceptionWrapper.BadRequestException("Show Time is missing.");
+            }
+            if (movie.getDuration() == null) {
+                throw new GlobalExceptionWrapper.BadRequestException("Movie duration is missing.");
+            }
+
+            // Check if movie already exists by name
+            if (movieRepository.existsByMovieName(movie.getMovieName())) {
+                throw new GlobalExceptionWrapper.BadRequestException(
+                        "Movie with name '" + movie.getMovieName() + "' already exists."
+                );
+            }
+
+            // Save the movie if all validations pass
             return movieRepository.save(movie);
         } catch (DataIntegrityViolationException e) {
-            throw new GlobalExceptionWrapper.BadRequestException("Movie with this name already exists");
+            throw new GlobalExceptionWrapper.BadRequestException("Movie with this name already exists.");
         }
     }
+
 
     @Override
     public String update(long id, Long entity) {
@@ -105,6 +125,7 @@ public class MovieService implements IMovieService {
         existingMovie.setGenre(movieDetails.getGenre());
         existingMovie.setDuration(String.valueOf(movieDetails.getDuration()));
         existingMovie.setDescription(movieDetails.getDescription());
+        existingMovie.setShowTime(movieDetails.getShowTime());
         // Save the updated movie back to the database
         return movieRepository.save(existingMovie);
     }

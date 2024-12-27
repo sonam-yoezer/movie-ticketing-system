@@ -31,6 +31,17 @@ public class  Movie {
     @Column(nullable = false)
     private String duration;
 
+    @Column(nullable = false)
+    private LocalDateTime showTime;
+
+    public LocalDateTime getShowTime() {
+        return showTime;
+    }
+
+    public void setShowTime(LocalDateTime showTime) {
+        this.showTime = showTime;
+    }
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "theatre_id", nullable = false)
     private Theatre theatre;

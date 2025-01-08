@@ -7,7 +7,6 @@ import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper.Unau
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,18 +15,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/theatres")
-@PreAuthorize("hasAuthority('ADMIN')")  // Ensures only admin can access these endpoints
 public class TheatreController {
 
     @Autowired
     private TheatreService theatreService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Theatre> createTheatre(@Validated @RequestBody Theatre theatre) {
         try {
             Theatre savedTheatre = theatreService.save(theatre);
             return ResponseEntity.ok(savedTheatre);
-        } catch (AccessDeniedException e) {
+        } catch (UnauthorizedAccessException e) {
             throw new UnauthorizedAccessException(ExceptionConstants.UNAUTHORIZED_THEATRE_OPERATION);
         }
     }
@@ -45,15 +44,16 @@ public class TheatreController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Theatre> updateTheatre(@PathVariable Long id, @Validated @RequestBody Theatre theatreDetails) {
         Theatre updatedTheatre = theatreService.updateTheatre(id, theatreDetails);
         return ResponseEntity.ok(updatedTheatre);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteTheatre(@PathVariable long id) {
         String message = theatreService.deleteById(id);
         return ResponseEntity.ok(message);
     }
-
 }

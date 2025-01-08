@@ -2,6 +2,7 @@ package com.java.movieticketingsystem.theatre.service;
 
 import com.java.movieticketingsystem.theatre.model.Theatre;
 import com.java.movieticketingsystem.theatre.repository.TheatreRepository;
+import com.java.movieticketingsystem.ticket.repository.TicketRepository;
 import com.java.movieticketingsystem.utils.constants.ExceptionConstants;
 import com.java.movieticketingsystem.utils.exception.GlobalExceptionWrapper;
 import com.java.movieticketingsystem.utils.exception.ResourceNotFoundException;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,6 +18,9 @@ public class TheatreService implements ITheatreService {
 
     @Autowired
     private TheatreRepository theatreRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @Override
     public List<Theatre> findAll() {
@@ -68,5 +73,4 @@ public class TheatreService implements ITheatreService {
         
         return theatreRepository.save(existingTheatre);
     }
-
 }

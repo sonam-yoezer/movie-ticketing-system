@@ -1,14 +1,9 @@
 package com.java.movieticketingsystem.utils.exception;
 
-
 import com.java.movieticketingsystem.utils.RestResponse;
 import org.springframework.http.ResponseEntity;
 
-import static com.java.movieticketingsystem.utils.exception.GlobalExceptionHandler.getStackTraceAsString;
-
-
 public interface IGlobalException {
-
     /**
      * Prepares the rest response from the exception encountered.
      *
@@ -17,7 +12,6 @@ public interface IGlobalException {
      */
     default ResponseEntity<RestResponse> getResponse(Exception exception) {
         RestResponse restResponse = setErrorResponse(exception);
-        restResponse.setErrorTrace(getStackTraceAsString(exception));
         return ResponseEntity.internalServerError().body(restResponse);
     }
 

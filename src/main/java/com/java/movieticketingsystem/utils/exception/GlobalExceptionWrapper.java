@@ -128,4 +128,59 @@ public class GlobalExceptionWrapper {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(restResponse);
         }
     }
+
+    @Getter
+    public static class SeatValidationException extends RuntimeException implements IGlobalException {
+        private final HttpStatus httpStatus;
+
+        public SeatValidationException(String message) {
+            super(message);
+            this.httpStatus = HttpStatus.BAD_REQUEST;
+        }
+
+        @Override
+        public ResponseEntity<RestResponse> getResponse(Exception exception) {
+            return ResponseEntity.badRequest().body(setErrorResponse(exception));
+        }
+    }
+
+    @Getter
+    public static class MovieBookingException extends RuntimeException implements IGlobalException {
+        private final HttpStatus httpStatus;
+
+        public MovieBookingException(String message) {
+            super(message);
+            this.httpStatus = HttpStatus.BAD_REQUEST;
+        }
+
+        public MovieBookingException(String message, HttpStatus httpStatus) {
+            super(message);
+            this.httpStatus = httpStatus;
+        }
+
+        @Override
+        public ResponseEntity<RestResponse> getResponse(Exception exception) {
+            return ResponseEntity.status(httpStatus).body(setErrorResponse(exception));
+        }
+    }
+
+    /**
+     * Specific exception for booking-related issues
+     */
+    @Getter
+    public static class BookingValidationException extends MovieBookingException {
+        public BookingValidationException(String message) {
+            super(message, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Specific exception for show timing related issues
+     */
+    @Getter
+    public static class ShowTimingException extends MovieBookingException {
+        public ShowTimingException(String message) {
+            super(message, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

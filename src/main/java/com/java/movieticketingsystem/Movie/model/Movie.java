@@ -1,7 +1,9 @@
 package com.java.movieticketingsystem.Movie.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.java.movieticketingsystem.theatre.model.Theatre;
+import com.java.movieticketingsystem.ticket.model.Ticket;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -36,6 +39,10 @@ public class  Movie {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "theatre_id", nullable = false)
     private Theatre theatre;
+
+    @OneToMany(mappedBy = "movie")
+    @JsonIgnore
+    private List<Ticket> tickets;
 
     public Theatre getTheatre() {
         return theatre;
@@ -88,5 +95,4 @@ public class  Movie {
     public void setDescription(String description){
         this.description = description;
     }
-
 }

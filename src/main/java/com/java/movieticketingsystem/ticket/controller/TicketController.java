@@ -8,14 +8,18 @@ import com.java.movieticketingsystem.utils.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/tickets")
-public class TicketController{
+public class TicketController {
     @Autowired
     private TicketService ticketService;
 
@@ -66,6 +70,36 @@ public class TicketController{
         } catch (Exception ex) {
             // Handle other errors
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/user/tickets")
+    @PreAuthorize("isAuthenticated()")  // Ensure that only authenticated users can access their tickets
+    public ResponseEntity<List<Ticket>> getUserTickets() {
+        // Get the currently logged-in user from the security context
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+        // You can create a User object using the username (email in this case)
+        User user = new User();
+        user.setEmail(username);
+
+        // Retrieve tickets for the logged-in user
+        List<Ticket> tickets = ticketService.findTicketsByUser(user);
+
+        return ResponseEntity.ok(tickets);
+    }
+
+    @GetMapping("{ticketId}")
+    public ResponseEntity<Ticket> getTicketDetails(@PathVariable Long ticketId) {
+        // Get the logged-in user's email from the Security Context
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+        Optional<Ticket> ticket = ticketService.findByIdAndUser(ticketId, username);
+
+        if (ticket.isPresent()) {
+            return ResponseEntity.ok(ticket.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 }

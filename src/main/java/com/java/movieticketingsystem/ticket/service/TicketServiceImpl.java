@@ -14,10 +14,12 @@ import com.java.movieticketingsystem.utils.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,6 +62,22 @@ public class TicketServiceImpl implements TicketService {
     }
 
     /**
+     * Validates if the selected seat is available for booking.
+     * Throws an exception if the seat number is invalid or already reserved.
+     */
+    private void validateSeatSelection(Theatre theatre, Integer seatNumber) {
+        if (seatNumber == null || seatNumber < 1 || seatNumber > theatre.getSeatingCapacity()) {
+            throw new GlobalExceptionWrapper.SeatValidationException("Invalid seat number. Please select a valid seat.");
+        }
+
+        // Fetch reserved seats and check if the seat is already booked
+        List<Integer> reservedSeats = ticketRepository.findReservedSeatsByTheatreId(theatre.getId());
+        if (reservedSeats.contains(seatNumber)) {
+            throw new GlobalExceptionWrapper.SeatValidationException("Selected seat is already reserved. Please choose another seat.");
+        }
+    }
+
+    /**
      * Saves a ticket after validating the movie, seat, and user.
      * It also assigns the logged-in user to the ticket.
      */
@@ -78,8 +96,10 @@ public class TicketServiceImpl implements TicketService {
             throw new GlobalExceptionWrapper.MovieBookingException("Theatre information is missing in the movie.");
         }
 
-        // Validate seat selection
-        validateSeatSelection(theatre, ticket.getSeatNumber());
+        // Validate seat selection for the specific Movie and Theatre combination
+        if (isSeatBooked(movie.getId(), theatre.getId(), ticket.getSeatNumber())) {
+            throw new GlobalExceptionWrapper.MovieBookingException("Seat is already booked.");
+        }
 
         // Fetch the logged-in user from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -92,21 +112,11 @@ public class TicketServiceImpl implements TicketService {
         return ticketRepository.save(ticket);
     }
 
-    /**
-     * Validates if the selected seat is available for booking.
-     * Throws an exception if the seat number is invalid or already reserved.
-     */
-    private void validateSeatSelection(Theatre theatre, Integer seatNumber) {
-        if (seatNumber == null || seatNumber < 1 || seatNumber > theatre.getSeatingCapacity()) {
-            throw new GlobalExceptionWrapper.SeatValidationException("Invalid seat number. Please select a valid seat.");
-        }
-
-        // Fetch reserved seats and check if the seat is already booked
-        List<Integer> reservedSeats = ticketRepository.findReservedSeatsByTheatreId(theatre.getId());
-        if (reservedSeats.contains(seatNumber)) {
-            throw new GlobalExceptionWrapper.SeatValidationException("Selected seat is already reserved. Please choose another seat.");
-        }
+    // Method to check if the seat is booked for a given movie and theatre combination
+    private boolean isSeatBooked(Long movieId, Long theatreId, int seatNumber) {
+        return ticketRepository.existsByMovie_IdAndMovie_Theatre_IdAndSeatNumber(movieId, theatreId, seatNumber);
     }
+
 
     /**
      * Checks if the seat is already booked for a given theatre.
@@ -152,6 +162,21 @@ public class TicketServiceImpl implements TicketService {
         }
 
         return seatStatusList;
+    }
+
+    @Override
+    public List<Ticket> findTicketsByUser(User user) {
+        // You can also retrieve the user from the SecurityContext if not passed explicitly
+        // Get the logged-in user's username (email)
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+        // Return tickets that belong to the logged-in user (you can use user.getEmail() instead of username if needed)
+        return ticketRepository.findByUserEmail(username);
+    }
+
+    @Override
+    public Optional<Ticket> findByIdAndUser(Long ticketId, String email) {
+        return ticketRepository.findByIdAndUserEmail(ticketId, email);
     }
     //underling method are for admin
 }

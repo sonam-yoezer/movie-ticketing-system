@@ -4,12 +4,14 @@ import com.java.movieticketingsystem.Movie.model.Movie;
 import com.java.movieticketingsystem.theatre.model.Theatre;
 import com.java.movieticketingsystem.ticket.model.SeatStatusDTO;
 import com.java.movieticketingsystem.ticket.model.Ticket;
+import com.java.movieticketingsystem.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -37,4 +39,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT t.seatNumber FROM Ticket t WHERE t.movie.id = :movieId AND t.movie.theatre.id = :theatreId")
     List<Integer> findReservedSeatsForMovieAndTheatre(@Param("movieId") Long movieId, @Param("theatreId") Long theatreId);
 
+    boolean existsByMovie_IdAndMovie_Theatre_IdAndSeatNumber(Long movieId, Long theatreId, int seatNumber);
+
+    List<Ticket> findByUserEmail(String email);
+
+    Optional<Ticket> findByIdAndUserEmail(Long ticketId, String email);
 }

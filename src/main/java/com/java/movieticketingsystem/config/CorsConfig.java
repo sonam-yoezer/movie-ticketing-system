@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig {
 
+    // This will be injected from application.properties or application.yml
     @Value("${cors.originUrl}")
     private String originUrl;
 
@@ -18,10 +19,10 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(originUrl)
+                        .allowedOrigins(originUrl)  // Allowed origins, should match the front-end URL
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                         .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowCredentials(true);  // Allow cookies, authorization headers, etc.
             }
         };
     }

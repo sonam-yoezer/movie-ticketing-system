@@ -44,6 +44,10 @@ public class  Movie {
     @JsonIgnore
     private List<Ticket> tickets;
 
+    private String image;
+
+    private String description;
+
     public Theatre getTheatre() {
         return theatre;
     }
@@ -59,8 +63,6 @@ public class  Movie {
     public void setId(long id) {
         this.id = id;
     }
-
-    private String description;
 
     //getter and setter method for update
     public String getMovieName() {

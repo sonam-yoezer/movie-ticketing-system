@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/webjars/**",
                                 "/swagger-resources/**").permitAll()
+                        .requestMatchers("/api/v1/files/movie-image/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

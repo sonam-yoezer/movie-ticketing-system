@@ -1,8 +1,11 @@
 package com.java.movieticketingsystem.Movie.service;
 
 import com.java.movieticketingsystem.Exception.ResourceNotFoundException;
+import com.java.movieticketingsystem.Movie.mapper.MovieMapper;
 import com.java.movieticketingsystem.Movie.model.Movie;
+import com.java.movieticketingsystem.Movie.model.MovieDTO;
 import com.java.movieticketingsystem.Movie.repository.MovieRepository;
+import com.java.movieticketingsystem.file.service.FileServiceImpl;
 import com.java.movieticketingsystem.theatre.model.Theatre;
 import com.java.movieticketingsystem.theatre.repository.TheatreRepository;
 import com.java.movieticketingsystem.theatre.service.TheatreService;
@@ -13,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,6 +30,9 @@ public class MovieServiceImpl implements MovieService {
 
     @Autowired
     private TheatreRepository theatreRepository;
+
+    @Autowired
+    private FileServiceImpl fileServiceImpl;
 
     @GetMapping("/add")
     public String showAddMovieForm(Model model) {
@@ -117,6 +124,28 @@ public class MovieServiceImpl implements MovieService {
 
         // Save the updated movie back to the database
         return movieRepository.save(existingMovie);
+    }
+
+    @Override
+    public MovieDTO updateMovieImage(Long movieId, MultipartFile file) {
+        // Fetch the movie from the repository
+        Movie currentMovie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new GlobalExceptionWrapper.NotFoundException("Movie not found with id: " + movieId));
+
+        // Delete the old image if it exists
+        if (currentMovie.getImage() != null) {
+            fileServiceImpl.deleteFile(currentMovie.getImage());
+        }
+
+        // Store the new image file
+        String fileName = fileServiceImpl.store(file, movieId);
+        currentMovie.setImage(fileName);
+
+        // Save the updated movie entity
+        Movie savedMovie = movieRepository.save(currentMovie);
+
+        // Convert the saved movie entity to a DTO and return it
+        return MovieMapper.toDTO(savedMovie);
     }
 
 }
